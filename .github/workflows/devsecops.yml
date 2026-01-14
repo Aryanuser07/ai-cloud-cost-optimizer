@@ -29,8 +29,9 @@ jobs:
     # ---------- Secrets Scan ----------
     - name: Run Gitleaks
       uses: gitleaks/gitleaks-action@v2
-      with:
-        fail: true
+      env:
+        GITLEAKS_ENABLE_UPLOAD_ARTIFACT: true
+        GITLEAKS_ENABLE_SUMMARY: true
 
     # ---------- Docker Image Scan ----------
     - name: Install Trivy
