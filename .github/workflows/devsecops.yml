@@ -1,0 +1,41 @@
+name: DevSecOps Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # ---------- SAST (Python) ----------
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install Bandit
+      run: pip install bandit
+
+    - name: Run Bandit (SAST)
+      run: bandit -r backend/app -ll
+
+    # ---------- Secrets Scan ----------
+    - name: Run Gitleaks
+      uses: gitleaks/gitleaks-action@v2
+      with:
+        fail: true
+
+    # ---------- Docker Image Scan ----------
+    - name: Install Trivy
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: fs
+        scan-ref: .
+        severity: CRITICAL,HIGH
